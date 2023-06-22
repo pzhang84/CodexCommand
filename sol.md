@@ -19,13 +19,13 @@ module purge
 
 showgpus # check the idleness of GPUs
 
-interactive -p gpu -q wildfire -t 60 --gres=gpu:1 
+interactive -c 8 -N 1 -t 0-4:00 --gres=gpu:a100:1
 ```
 
 # Set up env using Mamba
 ```bash
-mamba create --name myenv python=3.6
-conda activate myenv
+mamba create --name myenv python=3.8
+source activate myenv
 mamba install numpy
 ```
 
@@ -34,36 +34,26 @@ mamba install numpy
 #!/bin/bash
 
 #SBATCH -N 1            # number of nodes
-#SBATCH -c 1            # number of cores 
+#SBATCH -c 8            # number of cores 
 #SBATCH -t 0-01:00:00   # time in d-hh:mm:ss
 #SBATCH -p general      # partition 
 #SBATCH -q public       # QOS
-#SBATCH --gpus=a100:1
+#SBATCH --gpus=a100:3
 #SBATCH -o slurm.%j.out # file to save job's STDOUT (%j = JobId)
 #SBATCH -e slurm.%j.err # file to save job's STDERR (%j = JobId)
 #SBATCH --mail-type=ALL # Send an e-mail when a job starts, stops, or fails
 #SBATCH --export=NONE   # Purge the job-submitting shell environment
 
-# Load required modules for job's environment
 module load mamba/latest
-# mamba env list
-# Using python, so source activate an appropriate environment
-source activate scicomp
+source activate mygpt
 
-##
-# Generate 1,000,000 random numbers in bash,
-#   then store sorted results 
-#   in `Distribution.txt`
-##
-for i in $(seq 1 1e6); do
-  printf "%d\n" $RANDOM
-done | sort -n > Distribution.txt
+python run.py
 
 ```
 
 # About Scheduled Jobs.
 ```bash
-sbatch [JobId]
+sbatch run.sh
 scancel [JobId]
 myjobs                      # check all your submitted jobs
 seff [JobID]                # check details about the execution of a submitted job
