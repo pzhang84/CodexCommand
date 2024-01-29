@@ -1,6 +1,6 @@
 #### Quickly obtain an interactive session with a gpu
 ```bash
-interactive -p gpu -q wildfire -t 15 --gres=gpu:1
+interactive -p gpu -q wildfire -t 95 --gres=gpu:1
 ```
 
 #### Confirm the GPU allocation with the shell command: 
